@@ -1,0 +1,363 @@
+/* Basic page setup */
+:root {
+    --correct-color: #008d6b;
+    --almost-color: #c79c6c;
+    --wrong-color: #8a8682ff;
+    --christmas-red: #ea1c24;
+}
+
+body {
+    font-family:"Fuzzy Bubbles", sans-serif;
+    background-image: url('images/pattern01.jpg');
+    background-repeat: repeat;
+    background-size: 800px;
+    color: #333;
+    place-items: center;
+    min-height: 100vh;
+    margin: 0;
+    
+    /* CHANGED: Add padding for small screens */
+    padding: 10px 5px; 
+    box-sizing: border-box; /* Ensures padding is included in the body's size */
+}
+
+main {
+    text-align: center;
+    width: 100%; /* CHANGED: Make main container use full available width */
+    
+    /* NEW: Set a max-width for large screens */
+    max-width: 500px; 
+    
+    /* NEW: Ensures flex children (grid, keyboard) are stacked vertically */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+h1 {
+    color: var(--correct-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+p{
+    /* MIN: 1rem (16px)
+       FLUID: 0.5rem + 2.5vw (Scales with viewport width)
+       MAX: 1.5rem (24px)
+    */
+    font-size: clamp(1rem, 0.5rem + 2.5vw, 1.3rem);
+    line-height: 1.5;
+}
+
+button{
+    font-family: inherit;
+    background-color: white;
+    border: 0.5px solid var(--christmas-red);
+    border-radius: 4px;
+    box-shadow: 0.5px 0.5px 0px var(--christmas-red),
+        1px 1px 0px var(--christmas-red),
+        2px 2px 0px var(--christmas-red),
+        2.5px 2.5px 0px var(--christmas-red),
+        3px 3px 0px var(--christmas-red);
+    curson: pointer;
+    padding: 5px 10px;
+    margin: 10px;
+}
+
+#countdown-container{
+    background-color: var(--almost-color);
+    margin: 20px 0px;
+    padding: 20px 60px;
+    align-items: center;
+    border-radius: 15px;
+    box-shadow: 0.5px 0.5px 0px var(--correct-color),
+                1px 1px 0px var(--correct-color),
+                2px 2px 0px var(--correct-color),
+                2.5px 2.5px 0px var(--correct-color),
+                3px 3px 0px var(--correct-color),
+                4px 4px 0px var(--correct-color);
+}
+
+#countdown-header{
+    color: white;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+}
+
+
+/* Aside rules container */
+#rules-aside{
+    display: none; 
+    
+    /* Pop up */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Felülre helyezi az oldaltartalom fölé */
+    z-index: 10000; 
+    background-color: rgba(0, 0, 0, 0.5);
+
+    /* A belső .rules-container középre igazítása */
+    place-items: center;
+    overflow: hidden;
+}
+
+#rules-aside.visible{
+    display:grid;
+}
+
+#rules-container{
+    display: inherit;
+    background: white;
+    border-radius: 8px;
+    padding: 10px 30px;
+    box-shadow: 0.5px 0.5px 0px var(--christmas-red),
+            1px 1px 0px var(--christmas-red),
+            2px 2px 0px var(--christmas-red),
+            2.5px 2.5px 0px var(--christmas-red),
+            3px 3px 0px var(--christmas-red),
+            4px 4px 0px var(--christmas-red);
+    
+    position: relative;
+    max-width: 70%;
+    max-height: 80vh; /* nem magasabb a képernyőnél */
+    overflow-y: auto;
+    
+    
+    /* padding-right: 17px; */
+    /* box-sizing: content-box; */
+}
+
+#rules-button {
+    display: block;
+    cursor: pointer;
+}
+
+#close-button{
+    display:none;
+}
+
+#close-button.visible{
+    display:block;
+}
+
+.correct-text{
+    color: var(--correct-color);
+}
+
+.almost-text{
+    color: var(--almost-color);
+}
+
+/* The main game grid */
+#game-grid {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: grid;
+    grid-gap: 5px; 
+    margin-bottom: 20px;
+    width: 100%; /* NEW: Make the grid container use the full width of <main> */
+}
+
+#game-grid.idle{
+    font-family: inherit;
+    background-color: rgba(242, 250, 255, 0.63);
+    backdrop-filter: blur(8px);
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    font-size: clamp(1rem, 0.5rem + 2.5vw, 1.3rem);
+}
+
+/* Each row in the grid */
+.grid-row {
+    display: flex; /* This is the 'flex' solution you implemented */
+    justify-content: center;
+    grid-gap: 5px; /* Spacing between tiles */
+}
+
+/* A single tile for a letter */
+.grid-tile {
+    flex-grow: 1;  /* Allow tiles to grow to fill the row */
+    flex-basis: 0; /* Start from a 0 width, letting grow/shrink work */
+    aspect-ratio: 1 / 1;
+
+    max-width: 70px; 
+
+    border: 0.5px solid #ccccccff;
+    background-color: rgba(242, 250, 255, 0.63);
+    backdrop-filter: blur(8px);
+    
+    display: grid;
+    place-items: center;
+
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    
+    font-weight: bold;
+    text-transform: uppercase;
+    
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* --- Tile States --- */
+
+/* State: Letter is in the correct position */
+.grid-tile.correct {
+    backdrop-filter: none;
+    background-color: var(--correct-color);
+    border-color: var(--correct-color);
+    color: white;
+}
+
+/* State: Letter is in the word but in the wrong position */
+.grid-tile.present {
+    backdrop-filter: none;
+    background-color: var(--almost-color);
+    border-color: var(--almost-color);
+    color: white;
+}
+
+/* State: Letter is not in the word */
+.grid-tile.absent {
+    backdrop-filter: none;
+    background-color: var(--wrong-color);
+    border-color: var(--wrong-color);
+    color: white;
+}
+
+/* --- Feedback and Controls --- */
+
+#feedback-message {
+    font-size: 1.2rem;
+    font-weight: bold;
+    height: 30px; /* Reserve space to prevent layout jump */
+    color: var(--christmas-red); /* Red for errors */
+}
+
+/* ==================================== */
+/* ==   NEW KEYBOARD STYLES          == */
+/* ==================================== */
+
+#keyboard-container {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+/* Style for each key button */
+#keyboard-container button {
+    font-family: inherit;
+    font-weight: bold;
+    
+    font-size: clamp(0.7rem, 3vw, 1rem);
+    
+    padding: 12px 6px; 
+    
+    margin: 2px;
+    
+    flex-grow: 1; /* Allow keys to grow */
+    flex-basis: 0;  /* Allow keys to shrink */
+    
+    border: none;
+    border-radius: 5px;
+    background-color: #ffffffff;
+    color: #111;
+    cursor: pointer;
+    text-transform: uppercase;
+    
+    box-shadow: 0.5px 0.5px 0px var(--christmas-red),
+                1px 1px 0px var(--christmas-red),
+                2px 2px 0px var(--christmas-red),
+                2.5px 2.5px 0px var(--christmas-red),
+                3px 3px 0px var(--christmas-red),
+                4px 4px 0px var(--christmas-red);
+
+    /* transition: background-color 0.2s, color 0.2s; */
+    transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
+}
+
+#keyboard-container button:hover {
+    background-color: #b9bcc0;
+}
+
+#keyboard-container button:active {
+    background-color: #b9bcc0;
+    box-shadow: none;
+    transform: translate(4px, 4px);
+}
+
+/* Style for the wider keys (Enter, Del) */
+#keyboard-container button.key-wide {
+    flex-grow: 1.5; 
+}
+/* --- Keyboard Key States (same as tiles) --- */
+
+#keyboard-container button.correct {
+    background-color: var(--correct-color);
+    color: white;
+}
+
+#keyboard-container button.present {
+    background-color: var(--almost-color);
+    color: white;
+}
+
+#keyboard-container button.absent {
+    background-color: var(--wrong-color);
+    color: white;
+}
+
+@media (min-width: 1279px) {
+    body {
+        display: grid;
+        grid-template-areas: 
+            "header header header" 
+            "aside  main   .";
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0px 10px;
+        align-items: start;
+    }
+
+    header { grid-area: header; }
+    main { grid-area: main; }
+    #rules-aside { grid-area: aside; }
+
+    #rules-aside {
+        display: block !important;
+        position: static;
+        width: auto;
+        height: auto;
+        background-color: transparent; /* Ne legyen sötét háttere */
+        z-index: auto;
+        grid-area: aside;
+    }
+
+    /* 4. Az oldalsáv belső konténerének stílusa */
+    #rules-container {
+        padding: 20px 50px;
+        box-shadow: none;
+        max-width: 300px;
+        max-height: none;
+        overflow-y: visible;
+        background: #f5f5f5ff;
+    }
+
+    #rules-button,
+    #close-rules-button {
+        display: none;
+    }
+}
