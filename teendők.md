@@ -1,6 +1,7 @@
 # Teendők még
 - Új szavak!!
-- Egy nap egy játék
-- Design
+- szavak megkeverése
 - Stats oszlop
-- Felrakni githubra / az internetre
+    - Összesen megnyert játék
+    - Hány találatból nyerte meg
+    - Nyert vs vesztett játékok aránya

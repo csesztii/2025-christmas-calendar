@@ -12,11 +12,15 @@ const words = [
     'fenci',
     'sunyi',
     'puszko',
-    'kismuki'
+    'kismuki',
+    'tutko'
 ]
 const WORDS = words.map(word => word.toUpperCase());
+const WORD24 = 'SZERETLEK'
 const CHRISTMAS_RED = '#ea1c24';
 const CHRISTMAS_GREEN = '#008d6b';
+
+const DEBUG = true // TODO: set to false
 
 function getNextChristmas(currentDate) {
   const currentYear = currentDate.getFullYear();
@@ -49,12 +53,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = todayDate.getDate();
     const gridElement = document.getElementById('game-grid');
 
-    if (todayDate.getMonth() !== 11){
+    // rules container
+    const rulesButton = document.getElementById('rules-button');
+    const closeButton = document.getElementById('close-button');
+    const rulesContainer = document.getElementById('rules-aside');
+
+    rulesButton.addEventListener('click', () => {
+        rulesContainer.classList.add('visible');
+        closeButton.classList.add('visible');
+    
+    });
+
+    closeButton.addEventListener('click', () => {
+        rulesContainer.classList.remove('visible');
+        closeButton.classList.remove('visible');
+    });
+
+    if (!DEBUG && todayDate.getMonth() !== 11){
+        // todo: delete localStorage
         setIdleScreen('Látogass vissza decemberben :))');
         return
     }
 
-    if (today > 24){
+    if (!DEBUG && today > 24){
         setIdleScreen('Az Adventi időszak elmúlt. Élvezd a szünetet, amíg tudod.');
         return
     }
@@ -67,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('isGamesOver', JSON.stringify({}));
     }
 
-    let selectedWord = WORDS[today - 1]
+    let selectedWord = today == 24 ? WORD24 : WORDS[today - 1];
     console.log(selectedWord) // TODO: delete
 
     let wordLength = selectedWord.length
@@ -85,11 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const countdownHeader = document.getElementById('countdown-header');
     countdownHeader.textContent = diffInDays + ' nap van hátra Karácsonyig!';
-
-    // rules container
-    const rulesButton = document.getElementById('rules-button');
-    const closeButton = document.getElementById('close-button');
-    const rulesContainer = document.getElementById('rules-aside');
 
     // calendar function
     let gamesData = getLocalStorageData('isGamesOver')
@@ -341,17 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', handleKeyPress);
 
     keyboardContainer.addEventListener('click', handleMouseClick);
-
-    rulesButton.addEventListener('click', () => {
-        rulesContainer.classList.add('visible');
-        closeButton.classList.add('visible');
-    
-    });
-
-    closeButton.addEventListener('click', () => {
-        rulesContainer.classList.remove('visible');
-        closeButton.classList.remove('visible');
-    });
     
     if (!isGameOver){
         initGame();
