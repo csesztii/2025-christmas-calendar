@@ -48,6 +48,37 @@ function setLocalStorageData(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
+function setUpLocalStorage(debugging=false){
+    if (!debugging){
+            // stores the win (true) or lose (false) for every day in a dicionary
+        // the keys are the days
+        if (!localStorage.winnings){
+            localStorage.setItem('winnings', JSON.stringify([]));
+        }
+
+        // store the state of the game true (it's in progress) or false (it's over) in  dictionary
+        // the keys are the days
+        if (!localStorage.isGamesOver){
+            localStorage.setItem('isGamesOver', JSON.stringify({}));
+        }
+
+        // stores the number of tryes for every day in a list
+        // the indexes are the days
+        if (!localStorage.tryCount){
+            localStorage.setItem('tryCount', JSON.stringify([]));
+        }
+    } else{
+        localStorage.setItem('winnings', JSON.stringify([]));
+        localStorage.setItem('isGamesOver', JSON.stringify({}));
+        localStorage.setItem('tryCount', JSON.stringify([]));
+    }
+
+
+
+
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const todayDate = new Date();
     const today = todayDate.getDate();
@@ -80,14 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return
     }
 
-    if (!localStorage.winnings){
-        localStorage.setItem('winnings', JSON.stringify({}));
-    }
+    setUpLocalStorage(false); // TODO: delete the parameter 
 
-    if (!localStorage.isGamesOver){
-        localStorage.setItem('isGamesOver', JSON.stringify({}));
-    }
-
+    // word selection
     let selectedWord = today == 24 ? WORD24 : WORDS[today - 1];
     console.log(selectedWord) // TODO: delete
 
@@ -109,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // calendar function
     let gamesData = getLocalStorageData('isGamesOver')
+    
     let isGameOver = false;
     if (gamesData[today] === true){
         isGameOver = true;
@@ -119,13 +146,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let winningsData = getLocalStorageData('winnings')
-    if (!winningsData[today]) {
-        winningsData[today] = 0;
+
+    if (!winningsData[today - 1]) {
+        winningsData[today - 1] = 0;
         setLocalStorageData('winnings', winningsData);
     }
-    console.log(winningsData[today]) // TODO: delete
+    let countData = getLocalStorageData('tryCount')
+
+
+    console.log(winningsData[today - 1]) // TODO: delete
     console.log(gamesData[today]) // TODO: delete
-    
+    console.log(countData) // TODO: delete
+
+    // stats DOM elements
+    const wonGamesSpan = document.getElementById('won-games-span');
+    const sumGamesSpan = document.getElementById('sum-games-span');
+    const todaySpan = document.getElementById('today-span');
+    const avgScoreSpan = document.getElementById('avg-score-span');
+
+    function updateStats(){
+        // TODO: not finished
+        wonGamesSpan.textContent = winningsData.reduce((partialSum, a) => partialSum + a, 0)
+        sumGamesSpan.textContent = winningsData.length
+        avgScoreSpan.textContent = Math.ceil(countData.reduce((partialSum, a) => partialSum + a, 0) / countData.length)
+
+        if (isGameOver){
+            if (winningsData[today - 1]){
+                todaySpan.textContent = `Megnyert játék ${countData[today - 1]} próbálkozással`
+            }
+            else{
+                todaySpan.textContent = 'Elvesztett játék'
+            }
+            
+        } else{
+            todaySpan.textContent = '-'
+        }
+    }
 
     function initGame() {
         // Reset game state
@@ -133,6 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCol = 0;
         isGameOver = false;
         messageElement.textContent = "";
+        countData[today - 1] = 0;
+        setLocalStorageData('tryCount', countData);
 
         // Clear and create the grid
         createGrid();
@@ -228,11 +286,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const tile = allRows[currentRow][currentCol];
         tile.textContent = "";
     }
+    /**
+     * Sets and saves the game values in localStorage based on the won parameter.
+     * @param {boolean} won - If the game was won or not.
+     */
+    function setGameValues(won){
+        isGameOver = true
+        gamesData[today] = true;
+        setLocalStorageData('isGamesOver', gamesData);
+
+        if (won){
+            winningsData[today - 1] = 1;
+        }
+        else{
+            winningsData[today - 1] = 0;
+            countData[today - 1] = 0;
+            setLocalStorageData('tryCount', countData);
+        }
+        
+        setLocalStorageData('winnings', winningsData);
+
+        updateStats();
+    }
 
     /**
      * Submits the current guess for evaluation.
      */
     function submitGuess() {
+        countData[today - 1] += 1;
+        setLocalStorageData('tryCount', countData);
+
         const guess = allRows[currentRow].map(tile => tile.textContent).join('');
 
         // --- SIMPLIFICATION ---
@@ -247,11 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageElement.textContent = "Juhúú nyertél! 🎉";
             messageElement.style.color = CHRISTMAS_GREEN;
             messageElement.style.backgroundColor = 'white';
-            isGameOver = true;
-            gamesData[today] = true;
-            winningsData[today] = 1;
-            setLocalStorageData('isGamesOver', gamesData);
-            setLocalStorageData('winnings', winningsData);
+            setGameValues(true);
             return;
         }
 
@@ -264,12 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageElement.textContent = `Sajos nem jött össze! A szó ${selectedWord} volt.`;
             messageElement.style.color = CHRISTMAS_RED;
             messageElement.style.backgroundColor = 'white';
-            gamesData[today] = true;
-            setLocalStorageData('isGamesOver', gamesData);
-            winningsData[today] = 0;
-            setLocalStorageData('winnings', winningsData);
-            isGameOver = true;
-            
+            setGameValues(false);
         }
     }
 
@@ -348,6 +422,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    updateStats();
 
     function setIdleScreen(message){
         gridElement.classList.add('idle');
