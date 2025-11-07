@@ -168,8 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // TODO: not finished
         wonGamesSpan.textContent = winningsData.reduce((partialSum, a) => partialSum + a, 0)
         sumGamesSpan.textContent = winningsData.length
-        avgScoreSpan.textContent = Math.ceil(countData.reduce((partialSum, a) => partialSum + a, 0) / countData.length)
-
+        avgScoreSpan.textContent = Math.ceil(
+            countData.reduce((partialSum, a) => partialSum + a, 0) 
+            / countData.filter(item => item !== null).length
+            * 10) / 10;
+        
+        
         if (isGameOver){
             if (winningsData[today - 1]){
                 todaySpan.textContent = `Megnyert játék ${countData[today - 1]} próbálkozással`
