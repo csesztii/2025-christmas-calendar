@@ -1,26 +1,10 @@
-const words = [
-    'monyi',
-    'nyulca',
-    'csumpa',
-    'dragic',
-    'gecifej',
-    'nigga',
-    'nyunyi',
-    'cukii',
-    'cukso',
-    'murnyo',
-    'fenci',
-    'sunyi',
-    'puszko',
-    'kismuki',
-    'tutko'
-]
+const words = ['babzi', 'peszto', 'nigga', 'cukso', 'sunyi', 'majmoc', 'fenci', 'gecifej', 'puszko', 'dragic', 'gabona', 'csumpa', 'kismuki', 'hamilton', 'cukcsi', 'tutko', 'monyi', 'nyunyi', 'takci', 'nyulca', 'murnyo', 'kenyci', 'nyumi']
 const WORDS = words.map(word => word.toUpperCase());
 const WORD24 = 'SZERETLEK'
 const CHRISTMAS_RED = '#ea1c24';
 const CHRISTMAS_GREEN = '#008d6b';
 
-const DEBUG = true // TODO: set to false
+const DEBUG = false
 
 function getNextChristmas(currentDate) {
   const currentYear = currentDate.getFullYear();
@@ -50,7 +34,7 @@ function setLocalStorageData(key, data) {
 
 function setUpLocalStorage(debugging=false){
     if (!debugging){
-            // stores the win (true) or lose (false) for every day in a dicionary
+        // stores the win (true) or lose (false) for every day in a dicionary
         // the keys are the days
         if (!localStorage.winnings){
             localStorage.setItem('winnings', JSON.stringify([]));
@@ -101,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (!DEBUG && todayDate.getMonth() !== 11){
-        // todo: delete localStorage
+        setUpLocalStorage(true)
         setIdleScreen('Látogass vissza decemberben :))');
         return
     }
@@ -111,11 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return
     }
 
-    setUpLocalStorage(false); // TODO: delete the parameter 
+    setUpLocalStorage(false);
 
     // word selection
     let selectedWord = today == 24 ? WORD24 : WORDS[today - 1];
-    console.log(selectedWord) // TODO: delete
 
     let wordLength = selectedWord.length
     let currentCol = 0
@@ -153,11 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     let countData = getLocalStorageData('tryCount')
 
-
-    console.log(winningsData[today - 1]) // TODO: delete
-    console.log(gamesData[today]) // TODO: delete
-    console.log(countData) // TODO: delete
-
     // stats DOM elements
     const wonGamesSpan = document.getElementById('won-games-span');
     const sumGamesSpan = document.getElementById('sum-games-span');
@@ -165,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const avgScoreSpan = document.getElementById('avg-score-span');
 
     function updateStats(){
-        // TODO: not finished
         wonGamesSpan.textContent = winningsData.reduce((partialSum, a) => partialSum + a, 0)
         sumGamesSpan.textContent = winningsData.length
         avgScoreSpan.textContent = Math.ceil(
