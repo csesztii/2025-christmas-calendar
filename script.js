@@ -1,6 +1,3 @@
-const words = ['babzi', 'peszto', 'nigga', 'cukso', 'sunyi', 'majmoc', 'fenci', 'gecifej', 'puszko', 'dragic', 'gabona', 'csumpa', 'kismuki', 'hamilton', 'cukcsi', 'tutko', 'monyi', 'nyunyi', 'takci', 'nyulca', 'murnyo', 'kenyci', 'nyumi']
-const WORDS = words.map(word => word.toUpperCase());
-const WORD24 = 'SZERETLEK'
 const CHRISTMAS_RED = '#ea1c24';
 const CHRISTMAS_GREEN = '#008d6b';
 
@@ -84,21 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
         closeButton.classList.remove('visible');
     });
 
-    if (!DEBUG && todayDate.getMonth() !== 11){
-        setUpLocalStorage(true)
-        setIdleScreen('Látogass vissza decemberben :))');
-        return
-    }
-
-    if (!DEBUG && today > 24){
-        setIdleScreen('Az Adventi időszak elmúlt. Élvezd a szünetet, amíg tudod.');
-        return
-    }
-
     setUpLocalStorage(false);
 
     // word selection
-    let selectedWord = today == 24 ? WORD24 : WORDS[today - 1];
+    let selectedWord = 'CODING';
 
     let wordLength = selectedWord.length
     let currentCol = 0
@@ -114,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diffInDays = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
     const countdownHeader = document.getElementById('countdown-header');
-    countdownHeader.textContent = diffInDays + ' nap van hátra Karácsonyig!';
+    countdownHeader.textContent = diffInDays + ' days until the next Christmas';
 
     // calendar function
     let gamesData = getLocalStorageData('isGamesOver')
@@ -153,10 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isGameOver){
             if (winningsData[today - 1]){
-                todaySpan.textContent = `Megnyert játék ${countData[today - 1]} próbálkozással`
+                todaySpan.textContent = `Won game with ${countData[today - 1]} guesses`
             }
             else{
-                todaySpan.textContent = 'Elvesztett játék'
+                todaySpan.textContent = 'Lost game'
             }
             
         } else{
@@ -308,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check for win
         if (guess === selectedWord) {
-            messageElement.textContent = "Juhúú nyertél! 🎉";
+            messageElement.textContent = "Yay, you won! 🎉";
             messageElement.style.color = CHRISTMAS_GREEN;
             messageElement.style.backgroundColor = 'white';
             setGameValues(true);
@@ -321,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check for loss
         if (currentRow === wordLength) {
-            messageElement.textContent = `Sajos nem jött össze! A szó ${selectedWord} volt.`;
+            messageElement.textContent = `You couldn't guess it :(! The word was ${selectedWord}.`;
             messageElement.style.color = CHRISTMAS_RED;
             messageElement.style.backgroundColor = 'white';
             setGameValues(false);
@@ -418,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isGameOver){
         initGame();
     } else{
-        let message = 'A mai nap már játszottál! A következő feladványért látogass vissza holnap!';
+        let message = "You've already played today. For more games come back tomorrow!";
         setIdleScreen(message);
     }
 
